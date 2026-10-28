@@ -1,0 +1,57 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "rhm",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Built React app (frontend/dist). /api/* goes to the Worker; everything
+  // else is a static file, with unknown paths falling back to index.html.
+  "assets": {
+    "directory": "../frontend/dist",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+
+  // To serve on your own domain, add:
+  // "routes": [{ "pattern": "rhm.example.com", "custom_domain": true }]
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "rhm",
+      "database_id": "<your-d1-database-id>",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  // Monthly backups (SQL export, last 12 kept)
+  "r2_buckets": [
+    {
+      "binding": "BACKUPS",
+      "bucket_name": "rhm-backups"
+    }
+  ],
+
+  // One cron for all scheduled jobs.
+  // Runs daily at 00:05 IST (18:35 UTC); the code decides what is due.
+  "triggers": {
+    "crons": ["35 18 * * *"]
+  },
+
+  // Optional Cloudflare Access check. Not secrets: the team domain and the
+  // Access application's AUD tag, used to verify the Access JWT.
+  // Leave ACCESS_AUD empty to turn the check off.
+  "vars": {
+    "ACCESS_TEAM_DOMAIN": "",
+    "ACCESS_AUD": ""
+  },
+
+  "observability": {
+    "enabled": true
+  }
+
+  // Secrets (never in this file): JWT_SECRET; for Google Drive backups
+  // GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN.
+  // Local dev reads them from worker/.dev.vars (git-ignored).
+}

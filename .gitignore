@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+frontend/dist/
+
+# Environment (keep .env.example, ignore actual .env files)
+.env
+.env.*
+!.env.example
+.dev.vars*
+!.dev.vars.example
+
+# Wrangler local state (local D1 database lives here)
+.wrangler/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Lock files (optional - uncomment if you want to track them)
+# package-lock.json

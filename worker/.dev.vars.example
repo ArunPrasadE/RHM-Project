@@ -1,0 +1,8 @@
+# Copy this file to worker/.dev.vars for local development.
+# Never commit .dev.vars. On Cloudflare, set these with `wrangler secret put`.
+
+# Long random string
+JWT_SECRET=
+
+# Empty = skip the Cloudflare Access check (there is no Access locally)
+ACCESS_AUD=
