@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { createDb } from './lib/db.js';
 import { requireAccess } from './middleware/access.js';
+import { readOnlyGuard, isReadOnly } from './middleware/readOnly.js';
 import authRoutes from './routes/auth.js';
 import housesRoutes from './routes/houses.js';
 import tenantsRoutes from './routes/tenants.js';
@@ -33,6 +34,18 @@ const app = new Hono({ strict: false }).basePath('/api');
 
 // Cloudflare Access check (off when ACCESS_AUD is empty)
 app.use('*', requireAccess);
+
+// Read-only demo mode (off unless READ_ONLY is "true")
+app.use('*', readOnlyGuard);
+
+// Public: tells the login page whether this is a demo and which login to show
+app.get('/demo', (c) =>
+  c.json({
+    readOnly: isReadOnly(c.env),
+    username: c.env.DEMO_USERNAME || null,
+    password: c.env.DEMO_PASSWORD || null,
+  })
+);
 
 // Make the database wrapper available to every route as c.get('db')
 app.use('*', async (c, next) => {
@@ -82,13 +95,13 @@ export default {
 
   // Daily at 00:05 IST. The backfill is idempotent, so running it every day
   // creates each month's rent records on the 1st and repairs any missed day.
-  // On the 1st (IST) it also backs up to R2 and Google Drive.
+  // On the 1st (IST) it also backs up to R2 and Google Drive (not in read-only mode).
   async scheduled(controller, env, ctx) {
     const db = createDb(env.DB);
     const result = await generateMissingRentRecords(db);
     console.log(`[Scheduler] Rent backfill: ${result.created} created, ${result.skipped} already existed for ${result.tenants} tenants`);
 
-    if (nowIST().getUTCDate() === 1) {
+    if (nowIST().getUTCDate() === 1 && !isReadOnly(env)) {
       await runMonthlyBackups(env, db);
     }
   },

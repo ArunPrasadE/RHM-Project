@@ -6,3 +6,6 @@ JWT_SECRET=
 
 # Empty = skip the Cloudflare Access check (there is no Access locally)
 ACCESS_AUD=
+
+# Empty = writable app locally (wrangler.jsonc turns on the read-only demo mode)
+READ_ONLY=

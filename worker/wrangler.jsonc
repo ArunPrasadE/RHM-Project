@@ -20,18 +20,14 @@
     {
       "binding": "DB",
       "database_name": "rhm",
-      "database_id": "<your-d1-database-id>",
+      "database_id": "bae8f615-102b-4618-8ad0-372aa1cf303a",
       "migrations_dir": "migrations"
     }
   ],
 
-  // Monthly backups (SQL export, last 12 kept)
-  "r2_buckets": [
-    {
-      "binding": "BACKUPS",
-      "bucket_name": "rhm-backups"
-    }
-  ],
+  // Monthly backups (SQL export, last 12 kept). Off in the read-only demo.
+  // To turn them on, create an R2 bucket and add:
+  // "r2_buckets": [{ "binding": "BACKUPS", "bucket_name": "rhm-backups" }],
 
   // One cron for all scheduled jobs.
   // Runs daily at 00:05 IST (18:35 UTC); the code decides what is due.
@@ -42,9 +38,17 @@
   // Optional Cloudflare Access check. Not secrets: the team domain and the
   // Access application's AUD tag, used to verify the Access JWT.
   // Leave ACCESS_AUD empty to turn the check off.
+  //
+  // READ_ONLY = "true" turns the app into a read-only demo, and the login
+  // page shows DEMO_USERNAME / DEMO_PASSWORD (a public demo login, so not a
+  // secret). For your own install, set READ_ONLY to "" and remove the two
+  // DEMO_ lines.
   "vars": {
     "ACCESS_TEAM_DOMAIN": "",
-    "ACCESS_AUD": ""
+    "ACCESS_AUD": "",
+    "READ_ONLY": "true",
+    "DEMO_USERNAME": "demo",
+    "DEMO_PASSWORD": "demo1234"
   },
 
   "observability": {

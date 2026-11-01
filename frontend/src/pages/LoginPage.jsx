@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import PasswordInput from '../components/PasswordInput';
+import { useDemo } from '../hooks/useDemo';
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const demo = useDemo();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -34,6 +36,26 @@ export default function LoginPage() {
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Rental House Management</h1>
             <p className="text-gray-500 dark:text-gray-400 mt-2">Sign in to continue</p>
           </div>
+
+          {demo.username && demo.password && (
+            <div className="mb-6 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200 px-4 py-3 rounded-lg text-sm">
+              <p className="font-medium">Demo login</p>
+              <p className="mt-1">
+                Username <code className="font-mono font-semibold">{demo.username}</code>, password{' '}
+                <code className="font-mono font-semibold">{demo.password}</code>
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setUsername(demo.username);
+                  setPassword(demo.password);
+                }}
+                className="mt-2 underline font-medium"
+              >
+                Fill in the demo login
+              </button>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (

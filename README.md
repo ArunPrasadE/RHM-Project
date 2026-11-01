@@ -3,6 +3,9 @@
 A web app for managing rental houses, paddy fields and coconut groves in one dashboard, with rent and
 expense rules for Tamil Nadu, India. Single admin, mobile-friendly.
 
+**Live demo:** https://rhm.arun-prasad.workers.dev (username `demo`, password `demo1234`). The demo is
+read-only and every name and number in it is made up.
+
 ## Features
 
 - **Rental houses:** houses, current and past tenants, advance payments, move-in and move-out dates
@@ -48,6 +51,8 @@ Browser ──► Cloudflare Access (optional)
   in one query instead of one per tenant, to stay within Workers CPU and D1 per-request limits.
 - **No secrets in the repo:** secrets live in Worker secrets; the admin password is typed in at setup and only
   its bcrypt hash is stored.
+- **Read-only demo mode:** with `READ_ONLY = "true"`, one middleware refuses every write and the backup routes,
+  so a public demo login can't change or export anything (`worker/src/middleware/readOnly.js`).
 
 ## Project structure
 
@@ -56,10 +61,10 @@ frontend/              React app (Vite)
 worker/
   src/index.js         Hono app, route mounting, cron handler
   src/routes/          houses, tenants, payments, expenses, paddy/*, coconut/*, reports, backup
-  src/middleware/      Cloudflare Access check, app auth
+  src/middleware/      Cloudflare Access check, app auth, read-only mode
   src/utils/           scheduler (rent generation), backups, notifications
   migrations/          D1 schema
-  scripts/             create-admin
+  scripts/             create-admin, seed-demo (made-up data)
   wrangler.jsonc       Worker config
 ```
 
@@ -70,9 +75,17 @@ Requires Node.js 20+.
 ```bash
 cd worker
 npm install
-cp .dev.vars.example .dev.vars    # set JWT_SECRET; leave ACCESS_AUD empty locally
+cp .dev.vars.example .dev.vars    # set JWT_SECRET; leave ACCESS_AUD and READ_ONLY empty locally
 npm run build:frontend
 npm run db:migrate:local
 npm run create-admin -- --local
 npm run dev
 ```
+
+## Demo data
+
+The demo database is built locally and then copied to D1:
+
+1. Start the app locally with `READ_ONLY=` in `.dev.vars` (writable), on an empty database with a `demo` user.
+2. `RHM_USER=demo RHM_PASSWORD=demo1234 node scripts/seed-demo.mjs` adds the made-up data through the API.
+3. `npx wrangler d1 export rhm --local --output demo.sql`, then run that file against the remote D1 database.

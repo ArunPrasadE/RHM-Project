@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import Layout from './components/Layout/Layout';
 import LoginPage from './pages/LoginPage';
+import DemoBanner from './components/DemoBanner';
 import ModuleSelectorPage from './pages/ModuleSelectorPage';
 import UnifiedDashboard from './pages/UnifiedDashboard';
 import DashboardPage from './pages/DashboardPage';
@@ -50,6 +51,7 @@ function App() {
   const { user } = useAuth();
 
   return (
+    <>
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/" /> : <LoginPage />} />
 
@@ -118,6 +120,8 @@ function App() {
 
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
+    <DemoBanner />
+    </>
   );
 }
 
